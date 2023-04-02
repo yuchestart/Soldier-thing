@@ -70,7 +70,7 @@ const characterFrames ={
     fire:image("./resources/images/character/SoldierFire.svg")
 }
 const player = new Soldier(10,34)
-const enemies = [new Soldier(10,34,"enemy",300,0.6,700,500)]
+const enemies = [new Soldier(10,34,"enemy",1000,0.4,700,500),new Soldier(10,34,"enemy",1000,0.4,700,400),new Soldier(10,34,"enemy",1000,0.4,700,300)]
 const mission = {
     operationCost:0,
     score:0

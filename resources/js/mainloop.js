@@ -90,6 +90,17 @@ function mainloop(){
                 ctx.fillText(`${player.ammunition}/${player.maxAmmunition}`,810,590)
                 ctx.font = "15px monospace"
                 ctx.fillText("Rifle:",810,565)
+
+                ctx.fillStyle = "rgba(0,0,0,0.5)"
+                ctx.fillRect(0,550,150,50)
+                ctx.strokeStyle = "#000000"
+                ctx.fillStyle = "#FFFFFF"
+                ctx.font = "30px monospace"
+                ctx.fillText(`${player.health}/100`,10,590)
+                ctx.font = "15px monospace"
+                ctx.fillText("Player:",10,565)
+                break;
+            case "death":
                 break;
             default:
                 break;

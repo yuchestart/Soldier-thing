@@ -199,12 +199,7 @@ class Soldier{
                 }
                 break;
             }
-            if(this.type == "enemy"){
-                ctx.fillStyle = "rgba(255,0,0,0.5)"
-                ctx.fillRect(this.detection.x1,this.detection.y1,this.detection.x2-this.detection.x1,this.detection.y2-this.detection.y1)
-                ctx.fillStyle = "rgba(0,255,0,0.5)"
-                ctx.fillRect(this.fireRange.x1,this.fireRange.y1,this.fireRange.x2-this.fireRange.x1,this.fireRange.y2-this.fireRange.y1)
-            }
+            
         }
         
     }
@@ -231,7 +226,7 @@ class Soldier{
         this.state = "dead"
     }
     ai(){
-        if(this.type == "enemy"&&this.state!="dead"){
+        if(this.type == "enemy"&&this.state!="dead"&&player.state!="dead"){
             var head = player.hitbox.head;
             var body = player.hitbox.body;
             var inRange = this.detection.collides(head)||this.detection.collides(body)
@@ -242,10 +237,16 @@ class Soldier{
                 this.state = "walk"
                 var inFiringRange = this.fireRange.collides(head)||this.fireRange.collides(body)
                 if(inFiringRange){
+                    if(head.x1<this.x){
+                        this.direction = false
+                    } else {
+                        this.direction = true
+                    }
                     if(this.state!="aimfire")
                         this.state = "aim"
                     if(Math.floor(Math.random()*10)==5){
-                        this.fire(body.x1+7+(Math.random()*100-20),body.y1+7+(Math.random()*100-20))
+                        
+                        this.fire(head.x1+7+(Math.random()*40-20),head.y1+7+(Math.random()*40-20))
                     }
                 } else {
                 if(head.x1<this.x){
@@ -258,7 +259,6 @@ class Soldier{
                 if(head.y1<this.y){
                     this.y-=this.speed
                 } else {
-                    this.direction = true
                     this.y+=this.speed
                 }
                 }
@@ -350,6 +350,7 @@ function image(src){
 }
 
 function playerScript(){
+    if(player.state!="dead"){
     if(!keys.up&&!keys.down&&!keys.left&&!keys.right){
         if(!player.firing)
         player.state = "idle"
@@ -403,8 +404,10 @@ function playerScript(){
         }
     }
     }
+    }
     player.render()
     if(player.state == "aim" || player.state == "aimfire"){
         ctx.drawImage(images.crosshair,mouse.x-30,mouse.y-30,60,60)
     }
+
 }
