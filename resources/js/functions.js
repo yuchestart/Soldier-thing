@@ -28,9 +28,9 @@ class Rectangle{
 }
 
 class Soldier{
-    constructor(maxAmmunition,damage,type,detectionRange){
-        this.x=0
-        this.y=0
+    constructor(maxAmmunition,damage,type,detectionRange,firingRangePercentage,startX=0,startY=0){
+        this.x=startX
+        this.y=startY
         this.state="idle"
         this.type = type
         this.firing=false
@@ -44,7 +44,13 @@ class Soldier{
             head:new Rectangle(this.x+10,this.y,15,15,true),
             body:new Rectangle(this.x+10,this.y+15,15,60,true),
         }
+        this.frp = firingRangePercentage
         this.detection=new Rectangle(this.x-detectionRange,this.y-detectionRange,this.x+detectionRange,this.y+detectionRange)
+        this.detectionRange = detectionRange
+        this.fireRange = new Rectangle(this.x-detectionRange*this.frp
+            ,this.y-detectionRange*this.frp
+            ,this.x+detectionRange*this.frp
+            ,this.y+detectionRange*this.frp)
         this.maxAmmunition=maxAmmunition
         this.ammunition = maxAmmunition
         this.reloadTick = 0
@@ -59,6 +65,7 @@ class Soldier{
         if(this.ammunition>0&&this.state!="dead"){
         this.shootStart = false
         this.firing = true
+        this.fireTick = -1
         this.state = "aimfire"
         this.ammunition -= 1
         var newAudio = audio.gunshot.cloneNode()
@@ -68,6 +75,16 @@ class Soldier{
     }
     render(){
         if(this.state!="dead"){
+            if(this.type == "enemy"){
+                this.fireRange = new Rectangle(this.x-this.detectionRange*this.frp,
+                    this.y-this.detectionRange*this.frp,
+                    this.x+this.detectionRange*this.frp,
+                    this.y+this.detectionRange*this.frp)
+            this.detection=new Rectangle(this.x-this.detectionRange,
+                this.y-this.detectionRange,
+                this.x+this.detectionRange,
+                this.y+this.detectionRange)
+            }
         if(this.direction){
             this.hitbox={
                 head:new Rectangle(this.x+10,this.y,15,15,true),
@@ -125,6 +142,9 @@ class Soldier{
                 
                 break;
             case "aim":
+                if(this.firing&&this.fireTick>-1){
+                    this.state = "aimfire"
+                }
                 if(this.direction){
                     ctx.drawImage(characterFrames[`aim`],this.x,this.y,63,75)
                 } else {
@@ -140,7 +160,7 @@ class Soldier{
             case "aimfire":
                 this.fireTick++
                 if(this.fireTick>5){
-                    this.fireTick = 0
+                    this.fireTick = -1
                     this.state = "aim"
                     this.firing = false
                 }
@@ -182,12 +202,14 @@ class Soldier{
             if(this.type == "enemy"){
                 ctx.fillStyle = "rgba(255,0,0,0.5)"
                 ctx.fillRect(this.detection.x1,this.detection.y1,this.detection.x2-this.detection.x1,this.detection.y2-this.detection.y1)
+                ctx.fillStyle = "rgba(0,255,0,0.5)"
+                ctx.fillRect(this.fireRange.x1,this.fireRange.y1,this.fireRange.x2-this.fireRange.x1,this.fireRange.y2-this.fireRange.y1)
             }
         }
         
     }
     reload(){
-        if(this.state!="dead"){
+        if(this.state!="dead"&&!this.firing){
             this.firing = true
             this.state = "reload"
             this.reloadFrame = 1
@@ -209,8 +231,41 @@ class Soldier{
         this.state = "dead"
     }
     ai(){
-        if(this.type == "enemy"){
-
+        if(this.type == "enemy"&&this.state!="dead"){
+            var head = player.hitbox.head;
+            var body = player.hitbox.body;
+            var inRange = this.detection.collides(head)||this.detection.collides(body)
+            if(this.ammunition==0){
+                this.reload()
+            } else {
+            if(inRange){
+                this.state = "walk"
+                var inFiringRange = this.fireRange.collides(head)||this.fireRange.collides(body)
+                if(inFiringRange){
+                    if(this.state!="aimfire")
+                        this.state = "aim"
+                    if(Math.floor(Math.random()*10)==5){
+                        this.fire(body.x1+7+(Math.random()*100-20),body.y1+7+(Math.random()*100-20))
+                    }
+                } else {
+                if(head.x1<this.x){
+                    this.direction = false
+                    this.x-=this.speed
+                } else {
+                    this.direction = true
+                    this.x+=this.speed
+                }
+                if(head.y1<this.y){
+                    this.y-=this.speed
+                } else {
+                    this.direction = true
+                    this.y+=this.speed
+                }
+                }
+            } else {
+                this.state = "idle"
+            }
+            }
         }
     }
 }

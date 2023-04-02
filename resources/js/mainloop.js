@@ -75,6 +75,7 @@ function mainloop(){
                 ctx.fillStyle = "#CCCCCC"
                 ctx.fillRect(0,0,900,600)
                 for(var i=0; i<enemies.length; i++){
+                    enemies[i].ai()
                     enemies[i].render()
                 }
                 playerScript();
