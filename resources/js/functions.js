@@ -28,7 +28,7 @@ class Rectangle{
 }
 
 class Soldier{
-    constructor(maxAmmunition,damage,type,detectionRange,firingRangePercentage,startX=0,startY=0){
+    constructor(maxAmmunition,damage,type,detectionRange,firingRangePercentage,fireSpread,startX=0,startY=0){
         this.x=startX
         this.y=startY
         this.state="idle"
