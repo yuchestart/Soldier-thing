@@ -28,7 +28,7 @@ class Rectangle{
 }
 
 class Soldier{
-    constructor(maxAmmunition,damage,type,detectionRange,firingRangePercentage,fireSpread,startX=0,startY=0){
+    constructor(maxAmmunition,damage,type,detectionRange,firingRangePercentage,fireSpread,fireChance,startX=0,startY=0){
         this.x=startX
         this.y=startY
         this.state="idle"
@@ -60,9 +60,11 @@ class Soldier{
         }
         this.health = 100
         this.damage = damage
+        this.firespread = fireSpread;
+        this.fireChance = fireChance;
     }
     fire(x,y){
-        if(this.ammunition>0&&this.state!="dead"){
+        if(this.ammunition>0&&this.state!="dead"&&this.state!="aimfire"){
         this.shootStart = false
         this.firing = true
         this.fireTick = -1
@@ -75,6 +77,8 @@ class Soldier{
     }
     render(){
         if(this.state!="dead"){
+            let x = this.x;
+            let y = this.y;
             if(this.type == "enemy"){
                 this.fireRange = new Rectangle(this.x-this.detectionRange*this.frp,
                     this.y-this.detectionRange*this.frp,
@@ -84,6 +88,9 @@ class Soldier{
                 this.y-this.detectionRange,
                 this.x+this.detectionRange,
                 this.y+this.detectionRange)
+            } else if(this.type == "player"){
+                x = 0;
+                y = 0;
             }
         if(this.direction){
             this.hitbox={
@@ -113,11 +120,17 @@ class Soldier{
         switch(this.state){
             case "idle":
                 if(this.direction){
-                    ctx.drawImage(characterFrames[`idle`],this.x,this.y,52,75)
+                    if(this.type == "enemy")
+                        ctx.drawImage(enemyFrames[`idle`],this.x,this.y,52,75)
+                    else
+                        ctx.drawImage(characterFrames[`idle`],this.x,this.y,52,75)
                 } else {
                     ctx.translate(this.x+52,this.y)
                     ctx.scale(-1,1)
-                    ctx.drawImage(characterFrames[`idle`],0,0,52,75)
+                    if(this.type == "enemy")
+                        ctx.drawImage(enemyFrames[`idle`],0,0,52,75)
+                    else
+                        ctx.drawImage(characterFrames[`idle`],0,0,52,75)
                     ctx.setTransform(1,0,0,1,0,0)
                 }
                 this.walkFrame = 1
@@ -132,11 +145,22 @@ class Soldier{
                     this.walkFrame = 1
                 }
                 if(this.direction){
+                    if(this.type == "enemy"){
+                        ctx.drawImage(enemyFrames[`walk${this.walkFrame}`],this.x,this.y,55.5,75)
+                    } else {
                     ctx.drawImage(characterFrames[`walk${this.walkFrame}`],this.x,this.y,55.5,75)
+                    }
                 } else {
                     ctx.translate(this.x+55.5,this.y)
                     ctx.scale(-1,1)
+                    if(this.type == "enemy"){
+                        ctx.drawImage(enemyFrames[`walk${this.walkFrame}`],0,0,55.5,75)
+                    } else {
+                    
+                    
                     ctx.drawImage(characterFrames[`walk${this.walkFrame}`],0,0,55.5,75)
+                    
+                    }
                     ctx.setTransform(1,0,0,1,0,0)
                 }
                 
@@ -146,11 +170,19 @@ class Soldier{
                     this.state = "aimfire"
                 }
                 if(this.direction){
-                    ctx.drawImage(characterFrames[`aim`],this.x,this.y,63,75)
+                    if(this.type == "enemy"){
+                    ctx.drawImage(enemyFrames[`aim`],this.x,this.y,63,75)
+                    } else {
+                        ctx.drawImage(characterFrames[`aim`],this.x,this.y,63,75)
+                    }
                 } else {
                     ctx.translate(this.x+63,this.y)
                     ctx.scale(-1,1)
-                    ctx.drawImage(characterFrames[`aim`],0,0,63,75)
+                    if(this.type == "enemy"){
+                        ctx.drawImage(enemyFrames[`aim`],0,0,63,75)
+                        } else {
+                            ctx.drawImage(characterFrames[`aim`],0,0,63,75)
+                        }
                     ctx.setTransform(1,0,0,1,0,0)
                 }
                 //ctx.drawImage(characterFrames.aim,this.x,this.y,58,75)
@@ -166,11 +198,20 @@ class Soldier{
                 }
                 
                 if(this.direction){
-                    ctx.drawImage(characterFrames[`aimfire`],this.x,this.y,75,75)
+                    if(this.type == "enemy"){
+                        ctx.drawImage(enemyFrames[`aimfire`],this.x,this.y,75,75)
+                        } else {
+                            ctx.drawImage(characterFrames[`aimfire`],this.x,this.y,75,75)
+                        }
+                    
                 } else {
                     ctx.translate(this.x+63,this.y)
                     ctx.scale(-1,1)
-                    ctx.drawImage(characterFrames[`aimfire`],0,0,75,75)
+                    if(this.type == "enemy"){
+                        ctx.drawImage(enemyFrames[`aimfire`],0,0,75,75)
+                        } else {
+                            ctx.drawImage(characterFrames[`aimfire`],0,0,75,75)
+                        }
                     ctx.setTransform(1,0,0,1,0,0)
                 }
                 this.walkFrame = 1
@@ -190,10 +231,16 @@ class Soldier{
                     this.ammunition = this.maxAmmunition
                 }
                 if(this.direction){
+                    if(this.type == "enemy"){
+                        ctx.drawImage(enemyFrames[`reload${this.reloadFrame}`],this.x,this.y,55.5,75)
+                    } else
                     ctx.drawImage(characterFrames[`reload${this.reloadFrame}`],this.x,this.y,55.5,75)
                 } else {
                     ctx.translate(this.x+55.5,this.y)
                     ctx.scale(-1,1)
+                    if(this.type  == "enemy"){
+                        ctx.drawImage(enemyFrames[`reload${this.reloadFrame}`],0,0,55.5,75)
+                    } else 
                     ctx.drawImage(characterFrames[`reload${this.reloadFrame}`],0,0,55.5,75)
                     ctx.setTransform(1,0,0,1,0,0)
                 }
@@ -207,15 +254,15 @@ class Soldier{
         if(this.state!="dead"&&!this.firing){
             this.firing = true
             this.state = "reload"
-            this.reloadFrame = 1
+            this.reloadFrame = 1;
+            var reloadSound = audio.reload.cloneNode(true);
+            reloadSound.play()
         }
     }
-    takeDamage(damage,crit){
+    takeDamage(damage){
         damage = parseInt(damage)
         if(this.state!="dead"){
             this.health -= damage
-            var damage = new Damage(this.x+15,this.y+30,damage,objects.length,crit)
-            objects.push(damage)
             if(this.health <= 0){
                 this.health = 0
                 this.die()
@@ -223,10 +270,17 @@ class Soldier{
         }
     }
     die(){
-        this.state = "dead"
+        if(this.state!="dead"){
+            this.state = "dead";
+            if(this.type=="player"){
+                
+            state="death";
+            audio.death.play()
+            }
+        }
     }
     ai(){
-        if(this.type == "enemy"&&this.state!="dead"&&player.state!="dead"){
+        if(this.type == "enemy"&&this.state!="dead"&&player.state!="dead"&&!this.firing){
             var head = player.hitbox.head;
             var body = player.hitbox.body;
             var inRange = this.detection.collides(head)||this.detection.collides(body)
@@ -242,11 +296,14 @@ class Soldier{
                     } else {
                         this.direction = true
                     }
+                    if(this.ammunition >= 1){
                     if(this.state!="aimfire")
                         this.state = "aim"
-                    if(Math.floor(Math.random()*10)==5){
-                        
-                        this.fire(head.x1+7+(Math.random()*40-20),head.y1+7+(Math.random()*40-20))
+                    if(Math.floor(Math.random()*this.fireChance)==Math.floor(this.fireChance/2)){
+                        this.fire(head.x1+7+(Math.random()*this.firespread-this.firespread/2),head.y1+7+(Math.random()*this.firespread-this.firespread/2))
+                    }
+                    } else {
+                        this.reload()
                     }
                 } else {
                 if(head.x1<this.x){
@@ -270,41 +327,22 @@ class Soldier{
     }
 }
 
-class Damage{
-    constructor(x,y,value,id,crit){
-        this.x = x;
-        this.y = y;
-        this.id = id;
-        this.value = value;
-        this.ticks = 0;
-        this.crit = crit
-    }
-    render(){
-        this.ticks++
-        if(this.ticks<6){
-            if(this.crit){
-                ctx.fillStyle = `rgba(255,0,0,${(6-this.ticks)/6+0.2})`
-            } else {
-                ctx.fillStyle = `rgba(255,255,0,${(6-this.ticks)/6+0.2})`
-            }
-            ctx.font = "15px sans-serif"
-            ctx.strokeStyle = `rgba(0,0,0,${(6-this.ticks)/6+0.2})`
-            ctx.lineWidth = 1
-            ctx.strokeText(`-${this.value}`,this.x,this.y)
-            ctx.fillText(`-${this.value}`,this.x,this.y)
-            this.y-=2
-        } else {
-            objects.splice(this.id,1)
-        }
-    }
-}
-
 class Grenade{
     constructor(x,y,damage,id){
 
     }
 }
-
+class Medkit{
+    constructor(x,y,health,id){
+        this.x = x;
+        this.y = y;
+        this.health = health;
+        this.id = id;
+    }
+    render(){
+        
+    }
+}
 
 function setupMouse(){
     canvas.addEventListener("mousemove",function(e){
@@ -335,7 +373,7 @@ function fire(x,y,damage){
         var body = soldiers[i].hitbox.body;
         var point = new Rectangle(x,y,x,y)
         if(head.collides(point)){
-            soldiers[i].takeDamage(1.5*damage,true)
+            soldiers[i].takeDamage(1.5*damage)
         } else if(body.collides(point)){
             soldiers[i].takeDamage(damage)
         }

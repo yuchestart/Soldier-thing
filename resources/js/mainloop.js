@@ -101,6 +101,17 @@ function mainloop(){
                 ctx.fillText("Player:",10,565)
                 break;
             case "death":
+                game.deathTick++;
+                if(game.deathTick<80){
+                ctx.fillStyle = `black`
+                ctx.fillRect(0,0,900,600);
+                ctx.fillStyle = `rgba(255,255,255,${(50-game.deathTick+10)/50})`;
+                ctx.fillRect(0,0,900,600);
+                } else {
+                    state="menu"
+                    audio.menuTheme.currentTime = 0;
+                    player = Object.assign(Object.create(Object.getPrototypeOf(playertemplate)),playertemplate)
+                }
                 break;
             default:
                 break;

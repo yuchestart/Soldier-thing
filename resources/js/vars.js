@@ -37,7 +37,9 @@ const keymap = {
 }
 const audio = {
     menuTheme:new Audio("./resources/sounds/Menu Theme.mp3"),
-    gunshot:new Audio("./resources/sounds/shoot.wav")
+    gunshot:new Audio("./resources/sounds/shoot.wav"),
+    death:new Audio("./resources/sounds/death.mp3"),
+    reload:new Audio("./resources/sounds/reload.wav"),
 }
 const images = {
     logo:image("./resources/images/logo.svg"),
@@ -95,14 +97,18 @@ const enemyFrames = {
     aimfire:image("./resources/images/enemy/SoldierAimFire.svg"),
     fire:image("./resources/images/enemy/SoldierFire.svg")
 }
-const player = new Soldier(10,34)
-const enemies = [new Soldier(10,34,"enemy",1000,0.4,700,500),new Soldier(10,34,"enemy",1000,0.4,700,400),new Soldier(10,34,"enemy",1000,0.4,700,300)]
+const playertemplate = new Soldier(10,40,"player")
+let player = Object.assign(Object.create(Object.getPrototypeOf(playertemplate)),playertemplate)
+const enemies = [new Soldier(10,30,"enemy",1000,0.4,40,60,700,500),new Soldier(10,30,"enemy",1000,0.4,40,60,700,400),new Soldier(10,30,"enemy",1000,0.4,40,60,700,300)]
 const mission = {
     operationCost:0,
     score:0
 }
 const finance = {
     money:100
+}
+const game = {
+    deathTick:0
 }
 const objects = []
 const FRAMERATE = 30;
