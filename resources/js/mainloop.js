@@ -45,6 +45,7 @@ function mainloop(){
                 audio.menuTheme.currentTime = 0;
                 break;
             case "menu":
+                game.deathTick = 0
                 ctx.fillStyle = "#CCCCCC"
                 ctx.fillRect(0,0,900,600)
                 audio.menuTheme.loop = true
